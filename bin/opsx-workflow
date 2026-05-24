@@ -1,0 +1,140 @@
+#!/usr/bin/env node
+/**
+ * opsx-workflow CLI（插件模式）
+ *
+ * 用法:
+ *   opsx-workflow init <项目路径> [--preset minimal|openspec-gstack]
+ *   opsx-workflow detect <项目路径>
+ *   opsx-workflow validate <项目路径>
+ *   opsx-workflow check-deps <项目路径> [--install]
+ */
+
+const path = require("path");
+const fs = require("fs");
+const { execSync } = require("child_process");
+
+// 插件模式下用 CLAUDE_PLUGIN_ROOT，否则从脚本位置推断
+const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT ||
+  (fs.existsSync(path.join(__dirname, "..", ".claude-plugin", "plugin.json"))
+    ? path.join(__dirname, "..")
+    : path.join(__dirname, ".."));
+
+const command = process.argv[2];
+const projectDir = process.argv[3] || ".";
+const args = process.argv.slice(4);
+
+function resolveScript(name) {
+  return path.join(PLUGIN_ROOT, "scripts", name);
+}
+
+function run() {
+  switch (command) {
+    case "init": {
+      let preset = "openspec-gstack";
+      if (args.includes("--preset")) {
+        const presetIdx = args.indexOf("--preset") + 1;
+        if (presetIdx < args.length && args[presetIdx] && !args[presetIdx].startsWith("--")) {
+          preset = args[presetIdx];
+        } else {
+          console.log("ERROR: --preset 需要指定预设名称 (minimal | openspec-gstack)");
+          process.exit(1);
+        }
+      }
+      console.log("初始化五阶段开发流程...");
+      console.log(`项目: ${path.resolve(projectDir)}`);
+      console.log(`预设: ${preset}`);
+
+      // 1. 检测依赖
+      const checkResult = execSync(
+        `node "${resolveScript("install-dependencies.js")}" "${projectDir}" --check-only`,
+        { encoding: "utf-8" }
+      );
+      const check = JSON.parse(checkResult);
+      const missing = check.checks.filter((c) => !c.installed);
+      if (missing.length > 0) {
+        console.log("缺失依赖，正在安装...");
+        execSync(
+          `node "${resolveScript("install-dependencies.js")}" "${projectDir}" --install`,
+          { stdio: "inherit" }
+        );
+      }
+
+      // 2. 准备目标目录
+      const targetClaudeDir = path.join(projectDir, ".claude");
+      fs.mkdirSync(targetClaudeDir, { recursive: true });
+
+      // 3. 复制 phase-config.json（使用预设）
+      const presetFile = path.join(PLUGIN_ROOT, "templates", "presets", preset + ".json");
+      const configSrc = fs.existsSync(presetFile) ? presetFile : path.join(PLUGIN_ROOT, "templates", "phase-config.json");
+      fs.copyFileSync(configSrc, path.join(targetClaudeDir, "phase-config.json"));
+
+      // 4. 复制 karpathy.md
+      fs.copyFileSync(
+        path.join(PLUGIN_ROOT, "templates", "karpathy.md"),
+        path.join(targetClaudeDir, "karpathy.md")
+      );
+
+      // 5. 复制 settings.local.json（权限白名单）
+      fs.copyFileSync(
+        path.join(PLUGIN_ROOT, "templates", "settings.local.json"),
+        path.join(targetClaudeDir, "settings.local.json")
+      );
+
+      // 6. openspec-gstack 预设：复制 check-gstack.sh
+      if (preset === "openspec-gstack") {
+        fs.mkdirSync(path.join(targetClaudeDir, "hooks"), { recursive: true });
+        fs.copyFileSync(
+          path.join(PLUGIN_ROOT, "scripts", "check-gstack.sh"),
+          path.join(targetClaudeDir, "hooks", "check-gstack.sh")
+        );
+      }
+
+      console.log("配置文件已复制到 .claude/");
+
+      // 7. 验证
+      const validateResult = execSync(
+        `node "${resolveScript("validate-setup.js")}" "${projectDir}"`,
+        { encoding: "utf-8" }
+      );
+      const v = JSON.parse(validateResult);
+      if (v.valid) {
+        console.log("验证通过，五阶段开发流程搭建完成。");
+        console.log("提示：hooks 由插件自动提供，无需手动配置。");
+      } else {
+        console.log("验证发现问题:", v.missing.join(", "));
+        console.log("请手动补充缺失文件。");
+      }
+      break;
+    }
+    case "detect": {
+      execSync(`node "${resolveScript("detect-project-phase.js")}" "${projectDir}"`, { stdio: "inherit" });
+      break;
+    }
+    case "validate": {
+      execSync(`node "${resolveScript("validate-setup.js")}" "${projectDir}"`, { stdio: "inherit" });
+      break;
+    }
+    case "check-deps": {
+      const installFlag = args.includes("--install") ? "--install" : "--check-only";
+      execSync(
+        `node "${resolveScript("install-dependencies.js")}" "${projectDir}" ${installFlag}`,
+        { stdio: "inherit" }
+      );
+      break;
+    }
+    default:
+      console.log("用法: opsx-workflow <command> <项目路径> [options]");
+      console.log("");
+      console.log("命令:");
+      console.log("  init <路径>         初始化五阶段流程");
+      console.log("  detect <路径>       检测当前阶段");
+      console.log("  validate <路径>     验证搭建完整性");
+      console.log("  check-deps <路径>   检测依赖 (--install 自动安装)");
+      console.log("");
+      console.log("选项:");
+      console.log("  --preset <name>     预设: minimal | openspec-gstack (默认: openspec-gstack)");
+      console.log("  --install           自动安装缺失依赖");
+  }
+}
+
+run();

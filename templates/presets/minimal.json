@@ -1,0 +1,58 @@
+{
+  "_comment": "最小预设 -- 无 OpenSpec/GStack 依赖，使用 state-file 策略跟踪阶段",
+  "version": 1,
+
+  "pipeline": {
+    "phases": {
+      "1": { "name": "需求澄清", "description": "需求澄清与方案设计", "superpowers": false },
+      "2": { "name": "任务规划", "description": "任务规划与确认", "superpowers": false },
+      "3": { "name": "编码执行", "description": "编码执行与迭代", "superpowers": true },
+      "4": { "name": "质量门禁", "description": "质量门禁校验", "superpowers": true },
+      "5": { "name": "提交归档", "description": "提交归档与清理", "superpowers": true }
+    }
+  },
+
+  "detection": {
+    "strategy": "state-file",
+    "state_file": {
+      "path": ".claude/phase-state.json",
+      "template": { "phase": 1, "reason": "初始状态", "change": null, "qa_failed": false, "updated_at": "" }
+    }
+  },
+
+  "source_patterns": [
+    "src/",
+    "lib/",
+    "app/",
+    "tests/"
+  ],
+
+  "guard": {
+    "rules": [
+      { "phases": [1, 2], "tools": ["Edit", "Write"], "source_only": true, "reason": "需求/规划阶段禁止编辑源码，请先完成方案设计" },
+      { "phases": [4], "tools": ["Bash"], "command_pattern": "^git\\s+commit", "when_qa_failed": true, "reason": "QA 未通过，禁止提交，请返回编码阶段修复" }
+    ],
+    "skill_rules": [],
+    "dangerous_commands": {
+      "enabled": true,
+      "patterns": [
+        { "pattern": "rm\\s+-rf\\s+[/~]", "reason": "禁止删除根/home目录" },
+        { "pattern": "git\\s+push\\s+--force\\s+origin\\s+(main|master)", "reason": "禁止强推主分支" },
+        { "pattern": "DROP\\s+(DATABASE|TABLE)\\s+\\w+", "reason": "禁止直接删库/表" },
+        { "pattern": "curl[^|]+\\|\\s*(bash|sh)", "reason": "禁止管道执行远程脚本" }
+      ]
+    }
+  },
+
+  "environment": {
+    "checks": [
+      { "name": "Node.js", "type": "command", "command": "node --version", "required": true }
+    ]
+  },
+
+  "skill_routing": {
+    "enabled": false,
+    "check_script": "",
+    "routes": {}
+  }
+}

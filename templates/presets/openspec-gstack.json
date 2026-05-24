@@ -1,0 +1,96 @@
+{
+  "_comment": "OpenSpec + GStack 完整预设 -- 复制为 .claude/phase-config.json 使用",
+  "version": 1,
+
+  "pipeline": {
+    "phases": {
+      "1": { "name": "需求澄清", "description": "需求澄清与方案设计", "superpowers": false },
+      "2": { "name": "任务规划", "description": "任务规划与确认", "superpowers": false },
+      "3": { "name": "编码执行", "description": "编码执行与迭代", "superpowers": true },
+      "4": { "name": "质量门禁", "description": "质量门禁校验", "superpowers": true },
+      "5": { "name": "提交归档", "description": "提交归档与清理", "superpowers": true }
+    }
+  },
+
+  "detection": {
+    "strategy": "filesystem",
+    "filesystem": {
+      "state_dir": "openspec/changes",
+      "archive_dir_name": "archive",
+      "rules": [
+        { "phase": 1, "condition": "no_active_change", "reason": "无活跃change" },
+        { "phase": 1, "condition": "file_missing", "path": "{change_dir}/proposal.md", "reason": "proposal.md 不存在" },
+        { "phase": 1, "condition": "file_not_contains", "path": "{change_dir}/proposal.md", "marker": "STATUS: APPROVED", "reason": "proposal 未批准" },
+        { "phase": 2, "condition": "file_missing", "path": "{change_dir}/tasks.md", "reason": "tasks.md 不存在" },
+        { "phase": 2, "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: PENDING_REVIEW", "reason": "tasks 待审核" },
+        { "phase": 3, "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: IN_PROGRESS", "reason": "编码执行中" },
+        { "phase": 4, "condition": "all_of", "checks": [
+          { "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: DONE" },
+          { "condition": "file_missing", "path": "{change_dir}/qa_report.md" }
+        ], "reason": "质量门禁（待生成qa_report）" },
+        { "phase": 5, "condition": "all_of", "checks": [
+          { "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: DONE" },
+          { "condition": "file_contains", "path": "{change_dir}/qa_report.md", "marker": "RESULT: PASS" }
+        ], "reason": "QA通过，可提交归档" },
+        { "phase": 4, "condition": "all_of", "checks": [
+          { "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: DONE" },
+          { "condition": "file_contains", "path": "{change_dir}/qa_report.md", "marker": "RESULT: FAIL" }
+        ], "reason": "质量门禁（QA未通过）", "qa_failed": true }
+      ]
+    }
+  },
+
+  "source_patterns": [
+    "/frontend/src/",
+    "/backend/app/",
+    "/backend/tests/",
+    "/frontend/tests/"
+  ],
+
+  "guard": {
+    "rules": [
+      { "phases": [1, 2], "tools": ["Edit", "Write"], "source_only": true, "reason": "需求/规划阶段禁止编辑源码，请先完成方案设计" },
+      { "phases": [4], "tools": ["Bash"], "command_pattern": "^git\\s+commit", "when_qa_failed": true, "reason": "QA 未通过，禁止提交，请返回编码阶段修复" }
+    ],
+    "skill_rules": [
+      { "phases": [1, 2], "skill_patterns": ["opsx:apply", "openspec-apply-change"], "reason": "编码执行尚未启动，无法调用 opsx:apply" },
+      { "phases": [3, 4], "skill_patterns": ["opsx:archive", "openspec-archive-change"], "reason": "当前阶段不允许归档，需在阶段五执行" },
+      { "phases": [3, 4], "skill_patterns": ["ship"], "reason": "编码/质量门禁阶段不允许提交，需在阶段五执行 /ship" }
+    ],
+    "dangerous_commands": {
+      "enabled": true,
+      "patterns": [
+        { "pattern": "rm\\s+-rf\\s+[/~]", "reason": "禁止删除根/home目录" },
+        { "pattern": "git\\s+push\\s+--force\\s+origin\\s+(main|master)", "reason": "禁止强推主分支" },
+        { "pattern": "DROP\\s+(DATABASE|TABLE)\\s+\\w+", "reason": "禁止直接删库/表" },
+        { "pattern": "curl[^|]+\\|\\s*(bash|sh)", "reason": "禁止管道执行远程脚本" }
+      ]
+    }
+  },
+
+  "environment": {
+    "checks": [
+      { "name": "Node.js", "type": "command", "command": "node --version", "required": true },
+      { "name": "Python", "type": "command", "command": "python3 --version", "required": false },
+      { "name": "GStack", "type": "file_exists", "path": "~/.claude/skills/gstack/VERSION", "required": false },
+      { "name": "OpenSpec", "type": "file_exists", "path": "openspec/config.yaml", "required": false }
+    ]
+  },
+
+  "skill_routing": {
+    "enabled": true,
+    "check_script": ".claude/hooks/check-gstack.sh",
+    "routes": {
+      "需求讨论、方案评估与评审": "/office-hours",
+      "Bug排查、报错分析、故障定位": "/investigate",
+      "代码提交、部署、PR处理": "/ship",
+      "功能测试、缺陷挖掘": "/qa",
+      "代码规范性审查": "/review",
+      "安全合规审计": "/cso",
+      "架构方案评审": "/plan-eng-review",
+      "项目文档更新与发布": "/document-release",
+      "开发进度存档与恢复": "/checkpoint",
+      "代码健康度检查": "/health"
+    }
+  }
+}

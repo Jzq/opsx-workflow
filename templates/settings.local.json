@@ -1,0 +1,16 @@
+{
+  "_comment": "OpsX Workflow 权限白名单 -- 根据技术栈定制允许的工具调用",
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm test)",
+      "Bash(npm run test*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(node *)",
+      "Bash(openspec *)"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "opsx-workflow",
+  "displayName": "OpsX Five-Phase Workflow",
+  "version": "2.0.0",
+  "description": "Config-driven five-phase automated development workflow for Claude Code. Phase detection, operation guards, and dangerous command interception via hooks.",
+  "author": {
+    "name": "jizhiqiang"
+  },
+  "license": "MIT",
+  "keywords": ["phase-guard", "workflow", "hooks", "config-driven", "openspec", "gstack"],
+  "repository": "https://github.com/Jzq/claude-code-opsx-workflow"
+}

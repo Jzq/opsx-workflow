@@ -1,0 +1,102 @@
+{
+  "_comment": "五阶段流水线配置文件 -- 所有 hooks 从此文件读取配置，不再硬编码任何工具链或路径",
+  "_presets": "可从 presets/ 目录复制完整预设：openspec-gstack.json（完整版）或 minimal.json（最小版）",
+
+  "version": 1,
+
+  "pipeline": {
+    "phases": {
+      "1": { "name": "需求澄清", "description": "需求澄清与方案设计", "superpowers": false },
+      "2": { "name": "任务规划", "description": "任务规划与确认", "superpowers": false },
+      "3": { "name": "编码执行", "description": "编码执行与迭代", "superpowers": true },
+      "4": { "name": "质量门禁", "description": "质量门禁校验", "superpowers": true },
+      "5": { "name": "提交归档", "description": "提交归档与清理", "superpowers": true }
+    }
+  },
+
+  "detection": {
+    "_comment_strategy": "filesystem=从文件系统状态推导阶段; state-file=从JSON文件读取阶段; custom=自定义脚本",
+    "strategy": "state-file",
+
+    "state_file": {
+      "_comment": "strategy=state-file 时使用，读写此文件跟踪当前阶段",
+      "path": ".claude/phase-state.json",
+      "template": { "phase": 1, "reason": "初始状态", "change": null, "qa_failed": false, "updated_at": "" }
+    },
+
+    "filesystem": {
+      "_comment": "strategy=filesystem 时使用，从目录/文件状态推导阶段",
+      "state_dir": "openspec/changes",
+      "archive_dir_name": "archive",
+      "rules": [
+        { "phase": 1, "condition": "no_active_change", "reason": "无活跃change" },
+        { "phase": 1, "condition": "file_missing", "path": "{change_dir}/proposal.md", "reason": "proposal.md 不存在" },
+        { "phase": 1, "condition": "file_not_contains", "path": "{change_dir}/proposal.md", "marker": "STATUS: APPROVED", "reason": "proposal 未批准" },
+        { "phase": 2, "condition": "file_missing", "path": "{change_dir}/tasks.md", "reason": "tasks.md 不存在" },
+        { "phase": 2, "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: PENDING_REVIEW", "reason": "tasks 待审核" },
+        { "phase": 3, "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: IN_PROGRESS", "reason": "编码执行中" },
+        { "phase": 4, "condition": "all_of", "checks": [
+          { "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: DONE" },
+          { "condition": "file_missing", "path": "{change_dir}/qa_report.md" }
+        ], "reason": "质量门禁（待生成qa_report）" },
+        { "phase": 5, "condition": "all_of", "checks": [
+          { "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: DONE" },
+          { "condition": "file_contains", "path": "{change_dir}/qa_report.md", "marker": "RESULT: PASS" }
+        ], "reason": "QA通过，可提交归档" },
+        { "phase": 4, "condition": "all_of", "checks": [
+          { "condition": "file_contains", "path": "{change_dir}/tasks.md", "marker": "STATUS: DONE" },
+          { "condition": "file_contains", "path": "{change_dir}/qa_report.md", "marker": "RESULT: FAIL" }
+        ], "reason": "质量门禁（QA未通过）", "qa_failed": true }
+      ]
+    },
+
+    "custom": {
+      "_comment": "strategy=custom 时使用，指定自定义检测脚本路径",
+      "script": ".claude/hooks/lib/custom-phase-detector.js"
+    }
+  },
+
+  "source_patterns": [
+    "_comment: 源码路径正则模式，phase-guard 用此判断 Edit/Write 目标是否为源码文件",
+    "src/",
+    "lib/",
+    "app/",
+    "tests/"
+  ],
+
+  "guard": {
+    "_comment": "操作守卫规则：按阶段拦截不合规的工具调用",
+    "rules": [
+      { "phases": [1, 2], "tools": ["Edit", "Write"], "source_only": true, "reason": "需求/规划阶段禁止编辑源码，请先完成方案设计" },
+      { "phases": [4], "tools": ["Bash"], "command_pattern": "^git\\s+commit", "when_qa_failed": true, "reason": "QA 未通过，禁止提交，请返回编码阶段修复" }
+    ],
+    "skill_rules": [
+      { "phases": [1, 2], "skill_patterns": ["apply"], "reason": "编码执行尚未启动，无法执行编码类操作" },
+      { "phases": [3, 4], "skill_patterns": ["archive", "ship"], "reason": "当前阶段不允许归档/提交" }
+    ],
+    "dangerous_commands": {
+      "_comment": "通用危险命令拦截，与阶段无关，始终生效",
+      "enabled": true,
+      "patterns": [
+        { "pattern": "rm\\s+-rf\\s+[/~]", "reason": "禁止删除根/home目录" },
+        { "pattern": "git\\s+push\\s+--force\\s+origin\\s+(main|master)", "reason": "禁止强推主分支" },
+        { "pattern": "DROP\\s+(DATABASE|TABLE)\\s+\\w+", "reason": "禁止直接删库/表" },
+        { "pattern": "curl[^|]+\\|\\s*(bash|sh)", "reason": "禁止管道执行远程脚本" }
+      ]
+    }
+  },
+
+  "environment": {
+    "_comment": "启动检查项，startup-check.js 逐项验证",
+    "checks": [
+      { "name": "Node.js", "type": "command", "command": "node --version", "required": true }
+    ]
+  },
+
+  "skill_routing": {
+    "_comment": "Skill 路由映射表，可选。不使用 GStack 时设 enabled=false",
+    "enabled": false,
+    "check_script": "",
+    "routes": {}
+  }
+}

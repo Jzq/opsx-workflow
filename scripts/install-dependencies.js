@@ -182,7 +182,7 @@ const DEPENDENCIES = [
     required: false,
     install_commands: [],
     install_hint:
-      "在 Claude Code 中执行: /plugin marketplace add obra/superpowers-marketplace，然后 /plugin install superpowers@superpowers-marketplace",
+      "在 Claude Code 中执行: /plugin install superpowers@claude-plugins-official",
     description: "AI 编程超能力 Skill 集合（标准版插件）",
   },
 ];

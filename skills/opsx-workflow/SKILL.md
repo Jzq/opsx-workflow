@@ -108,8 +108,7 @@ opsx-workflow/                           # 插件根目录
 
 检测 Superpowers 插件是否已安装。如果 install-dependencies 报告未安装：
 - 引导用户在 Claude Code 中执行：
-  1. `/plugin marketplace add obra/superpowers-marketplace`
-  2. `/plugin install superpowers@superpowers-marketplace`
+  1. `/plugin install superpowers@claude-plugins-official`
 - 安装完成后执行 `/reload-plugins` 刷新插件列表
 
 ### 5. 生成配置文件

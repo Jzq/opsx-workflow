@@ -36,7 +36,7 @@ opsx-workflow/                           # 插件根目录
 │   ├── karpathy.md                     # Karpathy 编码原则
 │   ├── settings.local.json             # 权限白名单模板
 │   └── presets/
-│       ├── openspec-gstack.json        # 完整版预设
+│       ├── full.json                   # 完整版预设
 │       └── minimal.json                # 最小化预设
 └── bin/opsx-workflow                    # CLI 工具
 ```
@@ -53,7 +53,7 @@ opsx-workflow/                           # 插件根目录
     ├── standards/                     # 编码规范
     ├── skills/                        # OpenSpec + Superpowers（如使用）
     └── hooks/
-        └── check-gstack.sh           # 仅 openspec-gstack 预设
+        └── check-gstack.sh           # 仅 full 预设
 ```
 
 注意：hook JS 文件和 settings.json 不再复制到目标项目。插件通过 `hooks/hooks.json` 自动注册所有 hooks。
@@ -82,7 +82,7 @@ opsx-workflow/                           # 插件根目录
 
 1. 主要编程语言和框架（如 React+Express、Vue+FastAPI、Django 等）
 2. 源码目录结构（如 src/、lib/、app/）
-3. 是否使用 OpenSpec/GStack（未指定时默认 openspec-gstack）
+3. 是否使用 OpenSpec/GStack（未指定时默认 full）
 
 不要自行假设技术栈。
 
@@ -98,11 +98,11 @@ opsx-workflow/                           # 插件根目录
 | Node.js | node --version | 给提示 |
 | Python | python3 --version | 给提示 |
 
-### 3. 初始化 OpenSpec（仅 openspec-gstack 预设）
+### 3. 初始化 OpenSpec（仅 full 预设）
 
 **必须在第4步之前！** 在项目目录执行 `openspec init`。
 
-### 4. 安装 Superpowers（仅 openspec-gstack 预设）
+### 4. 安装 Superpowers（仅 full 预设）
 
 **必须在 openspec init 之后！**
 
@@ -114,7 +114,7 @@ opsx-workflow/                           # 插件根目录
 
 ### 5. 生成配置文件
 
-- 默认 openspec-gstack 预设，不用 OpenSpec → `presets/minimal.json`
+- 默认 full 预设，不用 OpenSpec → `presets/minimal.json`
 - 从 `${CLAUDE_PLUGIN_ROOT}/templates/presets/` 复制预设
 - 替换 source_patterns 和 environment.checks 为实际值
 - 写入 `<项目>/.claude/phase-config.json`
@@ -123,7 +123,7 @@ opsx-workflow/                           # 插件根目录
 
 - `${CLAUDE_PLUGIN_ROOT}/templates/karpathy.md` → `<项目>/.claude/karpathy.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/settings.local.json` → `<项目>/.claude/settings.local.json`
-- openspec-gstack 预设时：`${CLAUDE_PLUGIN_ROOT}/scripts/check-gstack.sh` → `<项目>/.claude/hooks/check-gstack.sh`
+- full 预设时：`${CLAUDE_PLUGIN_ROOT}/scripts/check-gstack.sh` → `<项目>/.claude/hooks/check-gstack.sh`
 
 ### 7. 生成项目特定文件
 

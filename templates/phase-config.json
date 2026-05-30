@@ -1,6 +1,6 @@
 {
   "_comment": "五阶段流水线配置文件 -- 所有 hooks 从此文件读取配置，不再硬编码任何工具链或路径",
-  "_presets": "可从 presets/ 目录复制完整预设：openspec-gstack.json（完整版）或 minimal.json（最小版）",
+  "_presets": "可从 presets/ 目录复制完整预设：full.json（完整版）或 minimal.json（最小版）",
 
   "version": 1,
 

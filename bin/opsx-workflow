@@ -3,7 +3,7 @@
  * opsx-workflow CLI（插件模式）
  *
  * 用法:
- *   opsx-workflow init <项目路径> [--preset minimal|openspec-gstack]
+ *   opsx-workflow init <项目路径> [--preset minimal|full]
  *   opsx-workflow detect <项目路径>
  *   opsx-workflow validate <项目路径>
  *   opsx-workflow check-deps <项目路径> [--install]
@@ -30,13 +30,13 @@ function resolveScript(name) {
 function run() {
   switch (command) {
     case "init": {
-      let preset = "openspec-gstack";
+      let preset = "full";
       if (args.includes("--preset")) {
         const presetIdx = args.indexOf("--preset") + 1;
         if (presetIdx < args.length && args[presetIdx] && !args[presetIdx].startsWith("--")) {
           preset = args[presetIdx];
         } else {
-          console.log("ERROR: --preset 需要指定预设名称 (minimal | openspec-gstack)");
+          console.log("ERROR: --preset 需要指定预设名称 (minimal | full)");
           process.exit(1);
         }
       }
@@ -80,8 +80,8 @@ function run() {
         path.join(targetClaudeDir, "settings.local.json")
       );
 
-      // 6. openspec-gstack 预设：复制 check-gstack.sh
-      if (preset === "openspec-gstack") {
+      // 6. full 预设：复制 check-gstack.sh
+      if (preset === "full") {
         fs.mkdirSync(path.join(targetClaudeDir, "hooks"), { recursive: true });
         fs.copyFileSync(
           path.join(PLUGIN_ROOT, "scripts", "check-gstack.sh"),
@@ -132,7 +132,7 @@ function run() {
       console.log("  check-deps <路径>   检测依赖 (--install 自动安装)");
       console.log("");
       console.log("选项:");
-      console.log("  --preset <name>     预设: minimal | openspec-gstack (默认: openspec-gstack)");
+      console.log("  --preset <name>     预设: minimal | full (默认: full)");
       console.log("  --install           自动安装缺失依赖");
   }
 }

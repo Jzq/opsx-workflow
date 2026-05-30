@@ -178,7 +178,7 @@ const DEPENDENCIES = [
     category: "core",
     check_type: "command",
     check_command:
-      "test -d \"$HOME/.claude/skills/superpowers\" -o -d \"$HOME/.claude/plugins/superpowers\"",
+      "grep -q 'superpowers@' \"$HOME/.claude/plugins/installed_plugins.json\" 2>/dev/null",
     required: false,
     install_commands: [],
     install_hint:

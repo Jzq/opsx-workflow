@@ -1,4 +1,4 @@
-# opsx-workflow
+# jizhiqiang
 
 [English](README.md)
 
@@ -7,11 +7,11 @@ Claude Code 插件：配置驱动的五阶段自动化开发流程。
 ## 安装
 
 ```bash
-# 从本地目录加载
-claude --plugin-dir /path/to/opsx-workflow
+# 添加 marketplace
+/plugin marketplace add Jzq/jzq-marketplace
 
-# 或从 GitHub 加载
-claude --plugin-url https://github.com/Jzq/claude-code-opsx-workflow/archive/refs/heads/plugin.zip
+# 安装插件
+/plugin install jizhiqiang@jzq-marketplace
 ```
 
 ## 功能
@@ -26,6 +26,12 @@ claude --plugin-url https://github.com/Jzq/claude-code-opsx-workflow/archive/ref
 ## 使用
 
 在加载了插件的 Claude Code 会话中：
+
+```
+/jizhiqiang:opsx-workflow
+```
+
+然后告诉它做什么：
 
 ```
 给 /path/to/my-project 搭建五阶段开发流程
@@ -64,6 +70,8 @@ opsx-workflow/
 ├── skills/opsx-workflow/SKILL.md # Skill 定义
 ├── scripts/                      # Hook 脚本 + 工具脚本
 ├── templates/                    # 配置模板 + 预设
+│   ├── presets/full.json         # 完整版预设（OpenSpec + GStack + Superpowers）
+│   └── presets/minimal.json      # 最小化预设（state-file，零依赖）
 └── bin/opsx-workflow             # CLI（可选）
 ```
 

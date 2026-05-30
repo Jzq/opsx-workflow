@@ -1,4 +1,4 @@
-# opsx-workflow
+# jizhiqiang
 
 [中文文档](README-zh.md)
 
@@ -7,11 +7,11 @@ A Claude Code plugin for config-driven five-phase automated development workflow
 ## Install
 
 ```bash
-# From local directory
-claude --plugin-dir /path/to/opsx-workflow
+# Add marketplace
+/plugin marketplace add Jzq/jzq-marketplace
 
-# Or from GitHub
-claude --plugin-url https://github.com/Jzq/claude-code-opsx-workflow/archive/refs/heads/plugin.zip
+# Install plugin
+/plugin install jizhiqiang@jzq-marketplace
 ```
 
 ## What It Does
@@ -28,13 +28,19 @@ Once installed, the plugin automatically:
 In any Claude Code session with the plugin loaded:
 
 ```
-Set up the five-phase workflow for /path/to/my-project
+/jizhiqiang:opsx-workflow
+```
+
+Then tell it what to do:
+
+```
+给 /path/to/my-project 搭建五阶段开发流程
 ```
 
 Or with options:
 
 ```
-Set up the five-phase workflow for /path/to/my-project, tech stack is React+Express, no OpenSpec
+给 /path/to/my-project 搭建五阶段开发流程，技术栈是 React+Express，不用 OpenSpec
 ```
 
 The plugin will generate `phase-config.json` and project-specific files. Hooks activate automatically.
@@ -64,6 +70,8 @@ opsx-workflow/
 ├── skills/opsx-workflow/SKILL.md # Skill definition
 ├── scripts/                      # Hook scripts + utilities
 ├── templates/                    # Config templates + presets
+│   ├── presets/full.json         # Full preset (OpenSpec + GStack + Superpowers)
+│   └── presets/minimal.json      # Minimal preset (state-file, zero dependencies)
 └── bin/opsx-workflow             # CLI (optional)
 ```
 

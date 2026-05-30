@@ -35,6 +35,9 @@ opsx-workflow/                           # 插件根目录
 │   ├── phase-config.json               # 默认配置模板
 │   ├── karpathy.md                     # Karpathy 编码原则
 │   ├── settings.local.json             # 权限白名单模板
+│   └── standards/                       # 架构约束模板
+│       ├── ddd.md                      # DDD 领域驱动设计约束
+│       └── existing-project-guide.md   # 现有项目分析指南
 │   └── presets/
 │       ├── full.json                   # 完整版预设
 │       └── minimal.json                # 最小化预设
@@ -83,6 +86,7 @@ opsx-workflow/                           # 插件根目录
 1. 主要编程语言和框架（如 React+Express、Vue+FastAPI、Django 等）
 2. 源码目录结构（如 src/、lib/、app/）
 3. 是否使用 OpenSpec/GStack（未指定时默认 full）
+4. 项目类型：新项目（默认采用 DDD 领域驱动设计）还是现有项目（从代码结构提取约束）
 
 不要自行假设技术栈。
 
@@ -128,7 +132,21 @@ opsx-workflow/                           # 插件根目录
 
 - `CLAUDE.md`（项目根目录）：使用 `@` 引用注入规范文件，声明技术栈和规则
 - `.claude/settings.local.json`：按技术栈定制权限白名单
-- `.claude/standards/`：按技术栈生成编码规范
+- `.claude/standards/`：按技术栈和项目类型生成编码规范
+
+#### 7a. 架构约束（按项目类型二选一）
+
+**新项目 → 复制 DDD 模板：**
+- `${CLAUDE_PLUGIN_ROOT}/templates/standards/ddd.md` → `<项目>/.claude/standards/ddd.md`
+
+**现有项目 → 分析代码生成约束：**
+- 阅读 `${CLAUDE_PLUGIN_ROOT}/templates/standards/existing-project-guide.md` 获取分析指南
+- 扫描目标项目的目录结构、关键文件、编码风格、技术栈特征
+- 生成 `<项目>/.claude/standards/architecture.md`（现有架构约束文件）
+
+#### 7b. 技术栈规范
+
+按技术栈生成框架级编码规范（如 react.md、fastapi.md、django.md）。
 
 **CLAUDE.md 模板（必须使用 @ 注入，确保规范自动加载到上下文）：**
 
@@ -141,11 +159,15 @@ opsx-workflow/                           # 插件根目录
 ## 编码原则
 @.claude/karpathy.md
 
+## 架构约束
+@.claude/standards/[ddd.md | architecture.md]
+
 ## 技术栈规范
 @.claude/standards/[按技术栈生成文件名].md
 
 ## 项目信息
 - 技术栈: [从步骤1确认的结果]
+- 项目类型: [新项目/现有项目]
 - 开发流程: 五阶段流水线（需求→规划→编码→QA→归档）
 ```
 

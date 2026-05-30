@@ -78,6 +78,14 @@ opsx-workflow/                           # 插件根目录
 - 是否使用 OpenSpec/GStack（未指定时默认使用完整版）
 - 源码目录结构（扫描 src/lib/app 等）
 
+**如果用户未指定技术栈或预设选择，必须使用 AskUserQuestion 询问以下信息后再继续：**
+
+1. 主要编程语言和框架（如 React+Express、Vue+FastAPI、Django 等）
+2. 源码目录结构（如 src/、lib/、app/）
+3. 是否使用 OpenSpec/GStack（未指定时默认 openspec-gstack）
+
+不要自行假设技术栈。
+
 ### 2. 检测与安装依赖
 
 运行 `node "${CLAUDE_PLUGIN_ROOT}/scripts/install-dependencies.js" <项目路径> --install`
@@ -86,7 +94,7 @@ opsx-workflow/                           # 插件根目录
 |------|---------|---------|
 | OpenSpec CLI | openspec --version | npm install -g |
 | GStack | ~/.claude/skills/gstack/ | git clone |
-| Superpowers | .claude/skills/using-superpowers/ | npx superpowers-zh |
+| Superpowers | ~/.claude/skills/superpowers 或 plugins 目录 | /plugin install（交互式） |
 | Node.js | node --version | 给提示 |
 | Python | python3 --version | 给提示 |
 
@@ -96,7 +104,13 @@ opsx-workflow/                           # 插件根目录
 
 ### 4. 安装 Superpowers（仅 openspec-gstack 预设）
 
-**必须在 openspec init 之后！** 执行 `npx superpowers-zh --tool claude-code`。
+**必须在 openspec init 之后！**
+
+检测 Superpowers 插件是否已安装。如果 install-dependencies 报告未安装：
+- 引导用户在 Claude Code 中执行：
+  1. `/plugin marketplace add obra/superpowers-marketplace`
+  2. `/plugin install superpowers@superpowers-marketplace`
+- 安装完成后执行 `/reload-plugins` 刷新插件列表
 
 ### 5. 生成配置文件
 
@@ -113,9 +127,28 @@ opsx-workflow/                           # 插件根目录
 
 ### 7. 生成项目特定文件
 
-- `CLAUDE.md`（项目根目录）：引用 phase-config.json，声明技术栈和规则
+- `CLAUDE.md`（项目根目录）：使用 `@` 引用注入规范文件，声明技术栈和规则
 - `.claude/settings.local.json`：按技术栈定制权限白名单
 - `.claude/standards/`：按技术栈生成编码规范
+
+**CLAUDE.md 模板（必须使用 @ 注入，确保规范自动加载到上下文）：**
+
+```markdown
+# 项目规范
+
+## 阶段配置
+@.claude/phase-config.json
+
+## 编码原则
+@.claude/karpathy.md
+
+## 技术栈规范
+@.claude/standards/[按技术栈生成文件名].md
+
+## 项目信息
+- 技术栈: [从步骤1确认的结果]
+- 开发流程: 五阶段流水线（需求→规划→编码→QA→归档）
+```
 
 ### 8. 验证
 

@@ -176,12 +176,14 @@ const DEPENDENCIES = [
   {
     name: "Superpowers",
     category: "core",
-    check_type: "dir_exists",
-    check_path: ".claude/skills/using-superpowers",
+    check_type: "command",
+    check_command:
+      "test -d \"$HOME/.claude/skills/superpowers\" -o -d \"$HOME/.claude/plugins/superpowers\"",
     required: false,
-    install_commands: ["npx superpowers-zh --tool claude-code"],
-    install_timeout: 60000,
-    description: "AI 编程超能力 Skill 集合（中文版）",
+    install_commands: [],
+    install_hint:
+      "在 Claude Code 中执行: /plugin marketplace add obra/superpowers-marketplace，然后 /plugin install superpowers@superpowers-marketplace",
+    description: "AI 编程超能力 Skill 集合（标准版插件）",
   },
 ];
 

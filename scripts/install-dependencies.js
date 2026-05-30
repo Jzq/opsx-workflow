@@ -158,6 +158,7 @@ const DEPENDENCIES = [
     install_timeout: 60000,
     // 注意: 不在此执行 openspec init！
     // openspec init 会覆盖 .claude/ 目录，必须由 agent 在生成完所有项目文件后再执行
+    // 正确命令: openspec init --tools claude
     description: "规范驱动的变更管理工具",
   },
   {

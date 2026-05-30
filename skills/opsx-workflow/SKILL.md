@@ -100,7 +100,7 @@ opsx-workflow/                           # 插件根目录
 
 ### 3. 初始化 OpenSpec（仅 full 预设）
 
-**必须在第4步之前！** 在项目目录执行 `openspec init`。
+**必须在第4步之前！** 在项目目录执行 `openspec init --tools claude`。
 
 ### 4. 安装 Superpowers（仅 full 预设）
 

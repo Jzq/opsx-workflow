@@ -1,4 +1,4 @@
-# jizhiqiang
+# dev-flow
 
 [中文文档](README-zh.md)
 
@@ -11,7 +11,7 @@ A Claude Code plugin for config-driven five-phase automated development workflow
 /plugin marketplace add Jzq/jzq-marketplace
 
 # Install plugin
-/plugin install jizhiqiang@jzq-marketplace
+/plugin install dev-flow@jzq-marketplace
 ```
 
 ## What It Does
@@ -28,7 +28,7 @@ Once installed, the plugin automatically:
 In any Claude Code session with the plugin loaded:
 
 ```
-/jizhiqiang:opsx-workflow
+/dev-flow:opsx-workflow
 ```
 
 Then tell it what to do:

@@ -1,4 +1,4 @@
-# jizhiqiang
+# dev-flow
 
 [English](README.md)
 
@@ -11,7 +11,7 @@ Claude Code 插件：配置驱动的五阶段自动化开发流程。
 /plugin marketplace add Jzq/jzq-marketplace
 
 # 安装插件
-/plugin install jizhiqiang@jzq-marketplace
+/plugin install dev-flow@jzq-marketplace
 ```
 
 ## 功能
@@ -28,7 +28,7 @@ Claude Code 插件：配置驱动的五阶段自动化开发流程。
 在加载了插件的 Claude Code 会话中：
 
 ```
-/jizhiqiang:opsx-workflow
+/dev-flow:opsx-workflow
 ```
 
 然后告诉它做什么：

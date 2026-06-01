@@ -1,6 +1,6 @@
 {
   "name": "claude-code-opsx-workflow-plugin",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Claude Code plugin: config-driven five-phase development workflow",
   "scripts": {
     "test": "node test/test-plugin-manifest.js && node test/test-hooks-registration.js && node test/test-detect.js && node test/test-guards.js && node test/test-install.js && node test/test-reminder.js && node test/test-setup.js && node test/test-startup.js"

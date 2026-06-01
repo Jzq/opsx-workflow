@@ -80,17 +80,15 @@
   "skill_routing": {
     "enabled": true,
     "check_script": ".claude/hooks/check-gstack.sh",
-    "routes": {
-      "需求讨论、方案评估与评审": "/office-hours",
-      "Bug排查、报错分析、故障定位": "/investigate",
-      "代码提交、部署、PR处理": "/ship",
-      "功能测试、缺陷挖掘": "/qa",
-      "代码规范性审查": "/review",
-      "安全合规审计": "/cso",
-      "架构方案评审": "/plan-eng-review",
-      "项目文档更新与发布": "/document-release",
-      "开发进度存档与恢复": "/checkpoint",
-      "代码健康度检查": "/health"
-    }
+    "routes": [
+      { "scenario": "功能测试、缺陷挖掘", "skill": "/qa", "phases": [4] },
+      { "scenario": "代码规范性审查", "skill": "/review", "phases": [4] },
+      { "scenario": "安全合规审计", "skill": "/cso", "phases": [4] },
+      { "scenario": "代码健康度检查", "skill": "/health", "phases": [4] },
+      { "scenario": "Bug排查、报错分析", "skill": "/investigate", "phases": [4] },
+      { "scenario": "代码提交、部署、PR处理", "skill": "/ship", "phases": [5] },
+      { "scenario": "项目文档更新与发布", "skill": "/document-release", "phases": [5] },
+      { "scenario": "开发进度存档与恢复", "skill": "/checkpoint", "phases": [5] }
+    ]
   }
 }

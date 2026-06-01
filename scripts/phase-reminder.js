@@ -77,6 +77,20 @@ function main() {
     context += `Superpowers：${superpowers ? "启用" : "禁用"}\n`;
   }
 
+  // Skill 路由建议（按阶段过滤 GStack 等路由）
+  if (config && config.skill_routing && config.skill_routing.enabled) {
+    const routes = config.skill_routing.routes || [];
+    const phaseRoutes = routes.filter(
+      (r) => Array.isArray(r.phases) && r.phases.includes(phaseInfo.phase)
+    );
+    if (phaseRoutes.length > 0) {
+      context += `\n## 可用 GStack Skill\n`;
+      for (const r of phaseRoutes) {
+        context += `- ${r.scenario} → 调用 ${r.skill}\n`;
+      }
+    }
+  }
+
   process.stdout.write(JSON.stringify({ additionalContext: context }) + "\n");
 }
 

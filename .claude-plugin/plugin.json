@@ -1,7 +1,7 @@
 {
   "name": "dev-flow",
   "displayName": "OpsX Five-Phase Workflow",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Config-driven five-phase automated development workflow for Claude Code. Phase detection, operation guards, and dangerous command interception via hooks.",
   "author": {
     "name": "jizhiqiang"

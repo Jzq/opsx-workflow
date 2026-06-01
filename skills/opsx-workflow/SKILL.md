@@ -99,6 +99,7 @@ openspec/changes/<change-name>/
 2. 源码目录结构（如 src/、lib/、app/）
 3. 是否使用 OpenSpec/GStack（未指定时默认 full）
 4. 项目类型：新项目（默认采用 DDD 领域驱动设计）还是现有项目（从代码结构提取约束）
+5. 开发者用户名（用于 git commit 的 Co-Authored-By 署名）
 
 不要自行假设技术栈。
 
@@ -228,10 +229,12 @@ openspec/changes/<change-name>/
   - `/checkpoint` — 开发进度存档与恢复
 - **原则**：外科手术式变更 — 提交信息精确描述变更，不混入无关修改
 - **约束**：归档后 change 移入 `archive/` 目录
+- **提交规范**：所有 git commit 末尾加 `Co-Authored-By: <用户名> via Claude Code`
 
 ## 项目信息
 - 技术栈: [从步骤1确认的结果]
 - 项目类型: [新项目/现有项目]
+- 开发者: [用户名]
 ```
 
 ### 8. 验证
@@ -293,6 +296,7 @@ openspec/changes/<change-name>/
   - `/checkpoint` — 开发进度存档与恢复
 - **原则**：外科手术式变更 — 提交信息精确描述变更，不混入无关修改
 - **约束**：归档后 change 移入 `archive/` 目录
+- **提交规范**：所有 git commit 末尾加 `Co-Authored-By: <用户名> via Claude Code`
 
 ## 常见陷阱
 
@@ -322,6 +326,7 @@ openspec/changes/<change-name>/
 10. 工具缺失或环境异常立即终止
 11. QA FAIL 禁止强行归档，返回阶段3修复
 12. 配置驱动优于硬编码，预设优于从零搭建
+13. Git 提交信息规范：末尾加 `Co-Authored-By: <用户名> via Claude Code`（用户名从项目 CLAUDE.md 的开发者字段读取）
 
 ## 验证清单
 

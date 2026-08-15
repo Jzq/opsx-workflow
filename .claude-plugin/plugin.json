@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "keywords": ["phase-guard", "workflow", "hooks", "config-driven", "openspec", "gstack"],
-  "repository": "https://github.com/Jzq/claude-code-opsx-workflow"
+  "repository": "https://github.com/Jzq/opsx-workflow"
 }

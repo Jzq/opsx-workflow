@@ -181,6 +181,9 @@ openspec/changes/<change-name>/
 ## 架构约束
 @.claude/standards/[ddd.md | architecture.md]
 
+## 编码规范
+@.claude/standards/[errors.md | 按项目类型生成文件名].md
+
 ## 技术栈规范
 @.claude/standards/[按技术栈生成文件名].md
 

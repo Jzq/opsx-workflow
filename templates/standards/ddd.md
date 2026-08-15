@@ -111,8 +111,8 @@ Infrastructure（基础设施层）
 
 ### 3.4 表现层（Presentation）
 
-- 接收入户请求，转换为应用层调用
-- 包含：Controller/Resolver、请求校验、响应序列化
+- 接收用户请求，转换为应用层调用
+- 包含：Controller/Router/Resolver（按技术栈命名）、请求校验、响应序列化
 - 禁止包含业务逻辑
 
 ---
@@ -127,6 +127,8 @@ Infrastructure（基础设施层）
 ---
 
 ## 五、目录结构约定
+
+### 5.1 标准结构（按限界上下文组织）
 
 ```
 src/
@@ -157,6 +159,26 @@ src/
     └── infrastructure/          # 通用基础设施
 ```
 
+### 5.2 轻量裁剪（小型项目示例）
+
+规模较小的单体项目（如 FastAPI + SQLite 一体化应用）可采用"按层扁平组织 + 按上下文拆分 router/service"的轻量 DDD，不强行套用完整 contexts 目录：
+
+```
+backend/
+├── main.py                 # 表现层入口（app 装配 + 路由分发）
+├── config.py               # 基础设施层（环境变量配置）
+├── database.py             # 基础设施层（数据库连接/会话）
+├── models.py               # 基础设施层（ORM 映射）
+├── schemas.py              # 表现层（请求/响应 DTO）
+├── routers/                # 表现层（API 路由，按上下文拆分）
+├── services/               # 应用层（用例编排）
+├── domain/                 # 领域层（业务规则；子域少时可并入 services/ 同文件）
+├── repositories/           # 基础设施层（仓储实现）
+└── tests/                  # 测试代码
+```
+
+> 注：无论何种结构，分层职责不变——业务规则只在领域层（独立 domain/ 或 services/ 内的领域模块），ORM 映射按上下文拆分文件而非全局共享单文件。随着子域增多，演进为 5.1 的 contexts 结构。
+
 ---
 
 ## 六、编码规范
@@ -166,9 +188,9 @@ src/
 - 聚合根：名词，如 `Order`、`User`、`Product`
 - 领域事件：过去时态，如 `OrderCreated`、`PaymentFailed`
 - 领域服务：动词+名词，如 `TransferService`、`PricingCalculator`
-- 仓储接口：`IOrderRepository`（TypeScript）/ `OrderRepository`（Python 协议类）
+- 仓储接口：`IOrderRepository`（TypeScript）/ `OrderRepository`（Python 协议类或抽象基类）
 - 值对象：名词，如 `Money`、`Address`、`Email`
-- 应用服务方法：动词开头，如 `placeOrder()`、`cancelSubscription()`
+- 应用服务方法：动词开头，如 `place_order()`（Python）/ `placeOrder()`（TypeScript）、`cancelSubscription()`
 
 ### 6.2 事务
 
@@ -191,7 +213,7 @@ src/
 | 贫血模型（实体只有 getter/setter） | 将行为封装在实体/值对象中 |
 | 跨聚合直接引用对象 | 只通过聚合根 ID 引用 |
 | 领域层依赖 ORM 框架 | 通过仓储接口隔离 |
-| 在 Controller 写业务逻辑 | 业务逻辑只在领域层 |
+| 在 Controller/Router 写业务逻辑 | 业务逻辑只在领域层 |
 | 一个大聚合包含所有关联数据 | 聚合保持最小，用 ID 引用关联 |
 | 跨上下文共享数据库表 | 每个上下文独立数据模型 |
 | 应用服务包含业务规则 | 业务规则只在领域层 |

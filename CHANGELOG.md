@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.9 (2026-08-15)
+
+- 新增 `templates/standards/errors.md` 通用错误码规范模板：领域异常 + 统一错误码 + 全局处理器，含号段分配原则、反模式与实测可用的死码检测脚本
+- `templates/standards/ddd.md` 去项目化：恢复通用分层架构图与 contexts 目录结构，项目特化扁平结构降级为轻量裁剪示例，命名规范恢复双语言
+- `SKILL.md` CLAUDE.md 模板新增编码规范注入位，与 errors.md 的约束生效声明对齐
+
 ## 2.0.8 (2026-08-15)
 
 ### Bug 修复

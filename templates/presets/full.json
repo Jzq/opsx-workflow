@@ -40,11 +40,12 @@
     }
   },
 
+  "_comment_source_patterns": "模式不要带前导 /，phase-guard 按 (^|/)+模式 锚定匹配路径段",
   "source_patterns": [
-    "/frontend/src/",
-    "/backend/app/",
-    "/backend/tests/",
-    "/frontend/tests/"
+    "frontend/src/",
+    "backend/app/",
+    "backend/tests/",
+    "frontend/tests/"
   ],
 
   "guard": {

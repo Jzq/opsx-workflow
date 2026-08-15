@@ -161,6 +161,36 @@ test("source_patterns 为空时所有文件都不是源码（不拦截任何编�
   assert.equal(result.exitCode, 0, "source_patterns 为空时不应拦截任何编辑");
 });
 
+test("带前导 / 的模式也应正确拦截（回归：/frontend/src/ 曾导致守卫失效）", () => {
+  const config = makeStateConfig(1);
+  config[".claude/phase-config.json"] = makeConfig({ source_patterns: ["/frontend/src/"] });
+  const dir = createFixture("guard-leading-slash", config);
+  const result = runGuard(dir, "Edit", { file_path: "/project/frontend/src/app.js" });
+  const parsed = JSON.parse(result.output);
+  assert.equal(parsed.permissionDecision, "deny", "前导 / 模式应能拦截源码编辑");
+});
+
+test("带前导 / 的模式对相对路径同样生效", () => {
+  const config = makeStateConfig(2);
+  config[".claude/phase-config.json"] = makeConfig({ source_patterns: ["/backend/app/"] });
+  const dir = createFixture("guard-leading-slash-rel", config);
+  const result = runGuard(dir, "Write", { file_path: "backend/app/main.py" });
+  const parsed = JSON.parse(result.output);
+  assert.equal(parsed.permissionDecision, "deny", "前导 / 模式应能拦截相对路径写入");
+});
+
+test("full.json 预设的 source_patterns 应能拦截源码编辑（预设回归）", () => {
+  const preset = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "..", "templates", "presets", "full.json"), "utf-8")
+  );
+  const config = makeStateConfig(1);
+  config[".claude/phase-config.json"] = makeConfig({ source_patterns: preset.source_patterns });
+  const dir = createFixture("guard-full-preset", config);
+  const result = runGuard(dir, "Edit", { file_path: "/project/backend/app/main.py" });
+  const parsed = JSON.parse(result.output);
+  assert.equal(parsed.permissionDecision, "deny", "full.json 预设应能拦截源码编辑");
+});
+
 test("编辑 .claude/ 下文件应被允许（即使阶段1）", () => {
   const dir = createFixture("guard-allow-claude-dir", makeStateConfig(1));
   const result = runGuard(dir, "Edit", { file_path: "/project/.claude/settings.json" });

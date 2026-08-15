@@ -22,15 +22,21 @@ function getPhaseName(config, phase) {
 
 /**
  * 构建源码路径正则数组（锚定匹配，避免误匹配）
+ *
+ * 模式会先去掉前导 / 做归一化：正则前缀 (^|\/) 已匹配一个斜杠，
+ * 若保留模式自带的前导 /，将要求路径中出现连续 // 才能命中，导致守卫永远不生效。
  */
 function getSourcePatterns(config) {
   const patterns = (config && config.source_patterns) || [];
   return patterns
     .filter((p) => typeof p === "string" && !p.startsWith("_"))
     .map((p) => {
-      const escaped = p.replace(/[.*+?^${}()|[\]\\]/g, (c) => (c === "/" ? "\\/" : "\\" + c));
+      const normalized = p.replace(/^\/+/, "");
+      if (!normalized) return null;
+      const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       return new RegExp(`(^|\\/)${escaped}`);
-    });
+    })
+    .filter(Boolean);
 }
 
 function isSourceCode(filePath, config) {
